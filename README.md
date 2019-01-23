@@ -18,7 +18,7 @@ These instructions will get you a copy of the project up,  build your equipment 
  - ESP.
  - RaspberryPi Zero W.
  - Breadboard.
- - 2 piezo captors.
+ - 2 piezo captors + 2 diodes.
  - 2 IR captors.
  - USB power supply / USB & Laptop power supply.
  - 10 *(5 for each team)* LED *(RGB)* / 5m LED *(RGB).*
@@ -36,13 +36,13 @@ These instructions will get you a copy of the project up,  build your equipment 
 **Disclaimer:** Arduino's IDE is available on (Windows XP/8.1/10, Linux & MacOS).
 
 	``https://www.arduino.cc/en/Main/Software``
-
-3.  Open project & configure your IDE:
+3.  Add **millisDay** librairy in installed Arduino folder in folder **libraries.** 
+4.  Open project & configure your IDE:
 	- Select tab **Tools.**
 	- ``Plug-in your board to your computer.``
 	- ``Select board: Arduino/Genuino Uno.``
 	- ``Select port: COM5.``
 
-4. That's it!
+5. That's it!
 
 
