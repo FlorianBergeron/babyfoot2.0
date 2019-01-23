@@ -24,7 +24,7 @@ void setup() {
   gamellePin = 5;
   gamelleLed = 6;
   
-  score=0;
+  scoreA=0;
   delayTime = 2000; //delay time == 2 seconds
   isGamelle = false;
   isScore = false;
@@ -58,7 +58,7 @@ void loop() {
    
  
   // Check IR captor is TRUE
-  if(scoreButtonStatus == HIGH && isGamelle == true && ledDelay.isFinished()==false) {
+  if(scoreButtonStatus == HIGH && isGamelle == true && gDelay.isFinished()==false) {
     isScore = true;
     digitalWrite(gamelleLed, HIGH);
     delay(100);
@@ -77,11 +77,11 @@ void loop() {
 
   // Increment score
   if(isScore == true && isGamelle == true) {
-    score++;
+    scoreA++;
     Serial.print("score = ");
-    Serial.println(score);
+    Serial.println(scoreA);
     delay(500);
-    for(int i=0; i<score; i++) {
+    for(int i=0; i<scoreA; i++) {
       digitalWrite(scoreLed, HIGH);
       delay(500);
       digitalWrite(scoreLed, LOW);
@@ -90,7 +90,7 @@ void loop() {
 
     
     // Score needed to win the game
-    if(score >= 3) {
+    if(scoreA >= 3) {
       Serial.println("YOU WON!");
       delay(1000);
       for(int i=0; i<10; i++) {
@@ -100,21 +100,21 @@ void loop() {
         delay(100);
       }
     // Reset score and captors when there is a goal
-    score = 0;
+    scoreA = 0;
     }
     isGamelle = false;
     isScore = false;
   }
   
 //Decrement score
-  if(isScore == false && isGamelle == true && ledDelay.isFinished()) {
-    if(score > 0 ){
-      score--;
+  if(isScore == false && isGamelle == true && gDelay.isFinished()) {
+    if(scoreA > 0 ){
+      scoreA--;
     }
     Serial.print("score = ");
-    Serial.println(score);
+    Serial.println(scoreA);
     delay(500);
-    for(int i=0; i<score; i++) {
+    for(int i=0; i<scoreA; i++) {
       digitalWrite(scoreLed, HIGH);
       delay(500);
       digitalWrite(scoreLed, LOW);
@@ -125,7 +125,7 @@ void loop() {
   // New Game ==> Reset score
   if(resetButtonStatus == HIGH) {
     Serial.println("New game");
-    score = 0;
+    scoreA = 0;
     delay(500);
     digitalWrite(scoreLed, HIGH);
     delay(2000);
