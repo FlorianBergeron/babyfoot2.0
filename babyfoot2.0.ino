@@ -1,74 +1,104 @@
 // #include <rgb_lcd.h>
 #include <millisDelay.h>
 
-int scoreLed;
-int scorePin;
+int scoreRedLed;
+int scoreBlueLed;
+
+int scoreRedBtn;
+int scoreBlueBtn;
+
 int gamelleLed;
-int gamellePin;
+
+int gamelleRedBtn;
+int gamelleBlueBtn;
+
 int resetButton;
 
-int scoreA;
-int scoreB;
+int scoreRed;
+int scoreBlue;
 
 int delayTime;
-boolean isGamelle;
-boolean isScore;
+boolean isGamelleRed;
+boolean isGamelleBlue;
 
-millisDelay gDelay;
+boolean isScoreRed;
+boolean isScoreBlue;
+
+millisDelay gDelayRed;
+millisDelay gDelayBlue;
 
 void setup() {
   // put your setup code here, to run once:
-  scorePin = 2;
-  scoreLed = 3;
-  resetButton = 4;
-  gamellePin = 5;
+  scoreRedLed = 3;
+  scoreBlueLed = 8;
   gamelleLed = 6;
-  
-  scoreA=0;
-  delayTime = 2000; //delay time == 2 seconds
-  isGamelle = false;
-  isScore = false;
 
-  pinMode(scoreLed, OUTPUT);
-  pinMode(scorePin, INPUT);
+  scoreRedBtn = 5;
+  scoreBlueBtn = 9;
+
+ 
+  gamelleRedBtn = 4;
+  gamelleBlueBtn = 7;
+
+  resetButton = 2;
+
+  scoreRed = 0;
+  scoreBlue = 0;
+
+  isGamelleRed = false;
+  isGamelleBlue = false;
+
+  isScoreRed = false;
+  isScoreBlue = false;
+
+  delayTime = 2000; //delay time == 2 seconds
+
+  pinMode(scoreRedLed, OUTPUT);
+  pinMode(scoreBlueLed, OUTPUT);
   pinMode(gamelleLed, OUTPUT);
-  pinMode(gamellePin, INPUT);
+   
+  pinMode(scoreRedBtn, INPUT);
+  pinMode(scoreBlueBtn, INPUT);
+  pinMode(gamelleRedBtn, INPUT);
+  pinMode(gamelleBlueBtn, INPUT);
   pinMode(resetButton, INPUT);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  boolean scoreButtonStatus = digitalRead(scorePin);
+  boolean scoreRedBtnStatus = digitalRead(scoreRedBtn);
+  boolean scoreBlueBtnStatus = digitalRead(scoreBlueBtn);
   boolean resetButtonStatus = digitalRead(resetButton);
-  boolean gamelleButtonStatus = digitalRead(gamellePin);
-  Serial.begin(115200);
+  boolean gamelleRedBtnStatus = digitalRead(gamelleRedBtn);
+  boolean gamelleBlueBtnStatus = digitalRead(gamelleBlueBtn);
+  
+Serial.begin(115200);
 
-  // Check piezo captor is TRUE
-  if(gamelleButtonStatus == HIGH) {
-    isGamelle = true;
-    digitalWrite(gamelleLed, HIGH);
+  //RED TEAM
+  // Check piezo Red captor is TRUE
+  if(gamelleRedBtnStatus == HIGH) {
+    isGamelleRed = true;
     delay(500);
+    digitalWrite(gamelleLed, HIGH);
+    delay(100);
     digitalWrite(gamelleLed, LOW);
-    if(isGamelle == true) {
-      Serial.println("gamelle");
+    delay(100);
+    digitalWrite(gamelleLed, HIGH);
+    delay(100);
+    digitalWrite(gamelleLed, LOW);
+    if(isGamelleRed == true) {
+      Serial.println("gamelle rouge");
       delay(10);
     }
-    gDelay.start(delayTime);
+    gDelayRed.start(delayTime);
   }
    
  
-  // Check IR captor is TRUE
-  if(scoreButtonStatus == HIGH && isGamelle == true && gDelay.isFinished()==false) {
-    isScore = true;
-    digitalWrite(gamelleLed, HIGH);
-    delay(100);
-    digitalWrite(gamelleLed, LOW);
-    delay(100);
-    digitalWrite(gamelleLed, HIGH);
-    delay(100);
-    digitalWrite(gamelleLed, LOW);
-    if(isScore == true) {
-      Serial.println("score");
+  // Check IR Red captor is TRUE
+  if(scoreRedBtnStatus == HIGH && isGamelleRed == true && gDelayRed.isFinished()==false) {
+    isScoreRed = true;
+    if(isScoreRed == true) {
+      Serial.println("score rouge");
       delay(10);
     }
   }
@@ -76,65 +106,161 @@ void loop() {
 
 
   // Increment score
-  if(isScore == true && isGamelle == true) {
-    scoreA++;
-    Serial.print("score = ");
-    Serial.println(scoreA);
+  if(isScoreRed == true && isGamelleRed == true) {
+    scoreRed++;
+    Serial.print("score bleu = ");
+    Serial.println(scoreBlue);
+    Serial.print("score red = ");
+    Serial.println(scoreRed);
     delay(500);
-    for(int i=0; i<scoreA; i++) {
-      digitalWrite(scoreLed, HIGH);
+    for(int i=0; i<scoreRed ;i++) {
+      digitalWrite(scoreRedLed, HIGH);
       delay(500);
-      digitalWrite(scoreLed, LOW);
+      digitalWrite(scoreRedLed, LOW);
       delay(250);
     }
 
     
     // Score needed to win the game
-    if(scoreA >= 3) {
+    if(scoreRed >= 3) {
       Serial.println("YOU WON!");
       delay(1000);
       for(int i=0; i<10; i++) {
-        digitalWrite(scoreLed, HIGH);
+        digitalWrite(scoreRedLed, HIGH);
         delay(100);
-        digitalWrite(scoreLed, LOW);
+        digitalWrite(scoreRedLed, LOW);
         delay(100);
       }
     // Reset score and captors when there is a goal
-    scoreA = 0;
+    scoreRed = 0;
+    scoreBlue = 0;
     }
-    isGamelle = false;
-    isScore = false;
+    isGamelleRed = false;
+    isScoreRed = false;
   }
   
 //Decrement score
-  if(isScore == false && isGamelle == true && gDelay.isFinished()) {
-    if(scoreA > 0 ){
-      scoreA--;
+  if(isScoreRed == false && isGamelleRed == true && gDelayRed.isFinished()) {
+    if(scoreBlue > 0 ){
+      scoreBlue--;
     }
-    Serial.print("score = ");
-    Serial.println(scoreA);
+    Serial.print("score bleu = ");
+    Serial.println(scoreBlue);
+    Serial.print("score red = ");
+    Serial.println(scoreRed);
     delay(500);
-    for(int i=0; i<scoreA; i++) {
-      digitalWrite(scoreLed, HIGH);
+    for(int i=0; i<scoreRed; i++) {
+      digitalWrite(scoreRedLed, HIGH);
       delay(500);
-      digitalWrite(scoreLed, LOW);
+      digitalWrite(scoreRedLed, LOW);
       delay(250);
     }
-    isGamelle = false;
+    isGamelleRed = false;
   }
+
+  //------------------------------------------------------------------------------------------------------------------------------------------------------ 
+  // BLUE TEAM
+  // Check piezo Red captor is TRUE
+  if(gamelleBlueBtnStatus == HIGH) {
+    isGamelleBlue = true;
+    delay(500);
+    digitalWrite(gamelleLed, HIGH);
+    delay(100);
+    digitalWrite(gamelleLed, LOW);
+    delay(100);
+    digitalWrite(gamelleLed, HIGH);
+    delay(100);
+    digitalWrite(gamelleLed, LOW);
+    if(isGamelleBlue == true) {
+      Serial.println("gamelle bleu");
+      delay(10);
+    }
+    gDelayBlue.start(delayTime);
+  }
+   
+ 
+  // Check IR Red captor is TRUE
+  if(scoreBlueBtnStatus == HIGH && isGamelleBlue == true && gDelayBlue.isFinished()==false) {
+    isScoreBlue = true;
+    if(isScoreBlue == true) {
+      Serial.println("score bleu");
+      delay(10);
+    }
+  }
+
+
+
+  // Increment score
+  if(isScoreBlue == true && isGamelleBlue == true) {
+    scoreBlue++;
+    Serial.print("score bleu = ");
+    Serial.println(scoreBlue);
+    Serial.print("score red = ");
+    Serial.println(scoreRed);
+    delay(500);
+    for(int i=0; i<scoreBlue ;i++) {
+      digitalWrite(scoreBlueLed, HIGH);
+      delay(500);
+      digitalWrite(scoreBlueLed, LOW);
+      delay(250);
+    }
+
+    
+    // Score needed to win the game
+    if(scoreBlue >= 3) {
+      Serial.println("YOU WON!");
+      delay(1000);
+      for(int i=0; i<10; i++) {
+        digitalWrite(scoreBlueLed, HIGH);
+        delay(100);
+        digitalWrite(scoreBlueLed, LOW);
+        delay(100);
+      }
+    // Reset score and captors when there is a goal
+    scoreBlue = 0;
+    scoreRed = 0;
+    }
+    isGamelleBlue = false;
+    isScoreBlue = false;
+  }
+  
+//Decrement score
+  if(isScoreBlue == false && isGamelleBlue == true && gDelayBlue.isFinished()) {
+    if(scoreRed > 0 ){
+      scoreRed--;
+    }
+    Serial.print("score rouge = ");
+    Serial.println(scoreRed);
+    Serial.print("score bleu = ");
+    Serial.println(scoreBlue);
+    delay(500);
+    for(int i=0; i<scoreBlue; i++) {
+      digitalWrite(scoreBlueLed, HIGH);
+      delay(500);
+      digitalWrite(scoreBlueLed, LOW);
+      delay(250);
+    }
+    isGamelleBlue = false;
+  }
+
+
+  //----------------------------------------------------------------------------------------------------------------------------------------------------------
   // New Game ==> Reset score
   if(resetButtonStatus == HIGH) {
     Serial.println("New game");
-    scoreA = 0;
+    scoreRed = 0;
+    scoreBlue = 0;
     delay(500);
-    digitalWrite(scoreLed, HIGH);
+    digitalWrite(scoreRedLed, HIGH);
+    digitalWrite(scoreBlueLed, HIGH);
     delay(2000);
-    digitalWrite(scoreLed, LOW);
+    digitalWrite(scoreRedLed, LOW);
+    digitalWrite(scoreBlueLed, LOW);
   }
 }
 
 // TODO
-// Gamelle ==> Décrementer score.
+
 // Gérer notion d'équipe.
 // Gérer les demi? (appuyer sur reset button ==> demi (-1 score et prochain but ==> score = score +2)).
 //                 (appuyer sur reset button pendant 3s ===> New Game function is call).
