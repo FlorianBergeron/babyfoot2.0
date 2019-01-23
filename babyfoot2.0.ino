@@ -1,4 +1,5 @@
 // #include <rgb_lcd.h>
+#include <millisDelay.h>
 
 int scoreLed;
 int scorePin;
@@ -6,10 +7,14 @@ int gamelleLed;
 int gamellePin;
 int resetButton;
 
-int score;
+int scoreA;
+int scoreB;
 
+int delayTime;
 boolean isGamelle;
 boolean isScore;
+
+millisDelay gDelay;
 
 void setup() {
   // put your setup code here, to run once:
@@ -20,7 +25,7 @@ void setup() {
   gamelleLed = 6;
   
   score=0;
-  
+  delayTime = 2000; //delay time == 2 seconds
   isGamelle = false;
   isScore = false;
 
@@ -48,10 +53,12 @@ void loop() {
       Serial.println("gamelle");
       delay(10);
     }
+    gDelay.start(delayTime);
   }
-
+   
+ 
   // Check IR captor is TRUE
-  if(scoreButtonStatus == HIGH && isGamelle == true) {
+  if(scoreButtonStatus == HIGH && isGamelle == true && ledDelay.isFinished()==false) {
     isScore = true;
     digitalWrite(gamelleLed, HIGH);
     delay(100);
@@ -66,6 +73,8 @@ void loop() {
     }
   }
 
+
+
   // Increment score
   if(isScore == true && isGamelle == true) {
     score++;
@@ -79,6 +88,7 @@ void loop() {
       delay(250);
     }
 
+    
     // Score needed to win the game
     if(score >= 3) {
       Serial.println("YOU WON!");
@@ -95,7 +105,23 @@ void loop() {
     isGamelle = false;
     isScore = false;
   }
-
+  
+//Decrement score
+  if(isScore == false && isGamelle == true && ledDelay.isFinished()) {
+    if(score > 0 ){
+      score--;
+    }
+    Serial.print("score = ");
+    Serial.println(score);
+    delay(500);
+    for(int i=0; i<score; i++) {
+      digitalWrite(scoreLed, HIGH);
+      delay(500);
+      digitalWrite(scoreLed, LOW);
+      delay(250);
+    }
+    isGamelle = false;
+  }
   // New Game ==> Reset score
   if(resetButtonStatus == HIGH) {
     Serial.println("New game");
