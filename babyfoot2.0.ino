@@ -74,13 +74,7 @@ Serial.begin(115200);
   if(gamelleRedBtnStatus == HIGH) {
     isGamelleRed = true;
     delay(500);
-    digitalWrite(gamelleLed, HIGH);
-    delay(100);
-    digitalWrite(gamelleLed, LOW);
-    delay(100);
-    digitalWrite(gamelleLed, HIGH);
-    delay(100);
-    digitalWrite(gamelleLed, LOW);
+    blinking(gamelleLed, 2, 100);
     if(isGamelleRed == true) {
       Serial.println("Gamelle rouge");
       delay(10);
@@ -121,12 +115,7 @@ Serial.begin(115200);
       Serial.println("!!!!!!!!!!!!!!!!!");
       Serial.println("!!!!!!!!!!!!!!!!!");
       delay(1000);
-      for(int i=0; i<10; i++) {
-        digitalWrite(scoreRedLed, HIGH);
-        delay(100);
-        digitalWrite(scoreRedLed, LOW);
-        delay(100);
-      }
+      blinking(scoreRedLed, 10, 100);
     // Reset score and captors when there is a goal
     scoreRed = 0;
     scoreBlue = 0;
@@ -159,25 +148,20 @@ Serial.begin(115200);
 
   //------------------------------------------------------------------------------------------------------------------------------------------------------ 
   // BLUE TEAM
-  // Check piezo Red captor is TRUE
+  // Check piezo Blue captor is TRUE
   if(gamelleBlueBtnStatus == HIGH) {
     isGamelleBlue = true;
     delay(500);
-    digitalWrite(gamelleLed, HIGH);
-    delay(100);
-    digitalWrite(gamelleLed, LOW);
-    delay(100);
-    digitalWrite(gamelleLed, HIGH);
-    delay(100);
-    digitalWrite(gamelleLed, LOW);
+    blinking(gamelleLed, 2, 100);
     if(isGamelleBlue == true) {
       Serial.println("Gamelle bleu");
       delay(10);
     }
     gDelayBlue.start(delayTime);
   }
-  
-  // Check IR Red captor is TRUE
+   
+ 
+  // Check IR Blue captor is TRUE
   if(scoreBlueBtnStatus == HIGH && isGamelleBlue == true && gDelayBlue.isFinished()==false) {
     isScoreBlue = true;
     if(isScoreBlue == true) {
@@ -210,12 +194,7 @@ Serial.begin(115200);
       Serial.println("!!!!!!!!!!!!!!!!!");
       Serial.println("!!!!!!!!!!!!!!!!!");
       delay(1000);
-      for(int i=0; i<10; i++) {
-        digitalWrite(scoreBlueLed, HIGH);
-        delay(100);
-        digitalWrite(scoreBlueLed, LOW);
-        delay(100);
-      }
+      blinking(scoreBlueLed, 10, 100);
     // Reset score and captors when there is a goal
     scoreRed = 0;
     scoreBlue = 0;
@@ -277,3 +256,15 @@ Serial.begin(115200);
 // Gérer notion d'équipe.
 // Gérer les demi? (appuyer sur reset button ==> demi (-1 score et prochain but ==> score = score +2)).
 //                 (appuyer sur reset button pendant 3s ===> New Game function is call).
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------
+// Functions
+
+void blinking(int pin, int occurences, int duration) {
+  for(int i=0; i<occurences; i++) {
+    digitalWrite(pin, HIGH);
+    delay(duration);
+    digitalWrite(pin, LOW);
+    delay(duration);
+  }
+}
