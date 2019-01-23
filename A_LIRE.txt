@@ -1,0 +1,1 @@
+La libraire est à mettre dans le folder "libraries" du dossier d'install d'Arduino
