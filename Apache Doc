@@ -1,0 +1,86 @@
+*******************Installation apache2********************************** 
+
+Mise à jour des paquets 
+    apt-get update && apt-get upgrade 
+Installer apache2/php7/
+    apt-get install apache2 php
+Aller dans /var/www
+  Créer un dossier "Site"
+    mkdir Site
+     Aller dans Serveur et creer une page index.html 
+Changer le propriétaire du dossier et des sous-dossiers 
+    chown -R www-data:www-data /var/www
+Aller dans /etc/apache2/sites-available :
+      cd /etc/apache2/sites-available
+Copier l'exemple de 000.default.conf pour le nouveau site 
+      cp 000.default.conf site.conf 
+Editer ce fichier en modifiant le « ServerName » qui correspond à l’adresse du site web, ainsi que « DocumentRoot » qui correspond au chemin sur le serveur.
+      nano  site.conf
+Activer le site et le module rewrite 
+    a2ensite site
+    a2enmod rewrite
+Recharger la configuration d'apache2 
+    systemctl reload apache2
+Editer le fichier de conf d'apache 
+   cd /etc/apache2
+   nano apache2.conf
+Modifier la ligne « AllowOverride None » dans la section « <Directory /var/www/> » par AllowOverride All
+Recharger apache2 
+      systemctl reload apache2
+     
+
+*********Certficat SSL*********************
+
+Activation de SSL pour Apache2 
+        a2enmod ssl 
+        a2ensite default-ssl 
+Création du dossier ou seront stockés les certificats ssl 
+        mkdir /etc/apche2/ssl 
+Générer la clé auto-signée et le certificat avec openssl : 
+        openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/apache2/ssl/stan-selfsigned.key -out /etc/apache2/ssl/stan-selfsigned.crt
+     (Mettre comme common name l'adresse du serveur web )
+ Adapter le chmod des certificats : 
+        chmod 600 /etc/apache2/ssl/*
+ Edition du fichier /etc/apache2/sites-enabled/default-ssl.conf
+        nano /etc/apache2/sites-enabled/default-ssl.conf 
+        Modifier les lignes ServerName,SSLCertificateFile ,SSLCertificateKeyFile de facon suivante : 
+            ServerName (AdresseServeur:443)
+            SSLCertificateFile /etc/apache2/ssl/stan-selfsigned.crt
+            SSLCertificateKeyFile /etc/apache2/ssl/stan-selfsigned.key
+Rédemarrer Apache : systemctl restart apache2 
+Les sites de ce serveur devrait-être accessible depuis l’URL : https://adresseserveur/.
+
+Rendre la redirection hhtp vers https permanente : 
+    nano /etc/apache2/sites-available/000-default.conf 
+        Ajouter la ligne suivante avant  : Redirect permanent "/" "https://adresseserveur/" 
+Rédemarrer le service : systemctl restart apache2 
+
+
+**************Basic Authentification*************************
+
+Télécharger le paquet apache2-utils : 
+    apt-get install apache2-utils 
+Créer le fichier auth-basic.conf dans sites-available :
+    nano /etc/apache2/sites-available/auth-basic.conf
+                conf : <Directory /var/www/html/auth-basic>
+                            AuthType Basic
+                            AuthName "Basic Authentication"
+                            AuthUserFile /etc/apache2/.htpasswd
+                            require valid-user
+                       </Directory>
+  Créer un utilisateur avec la commande: 
+        htpasswd -c /etc/apache2/.htpasswd "user"
+  Créer un répertoire auth-basic dans html 
+         mkdir /var/www/html/auth-basic
+  Créer une page de test dans auth-basic :
+          nano /var/www/html/auth-basic/index.html
+  conf:              <html>
+                     <body>
+                     <div style="width: 100%; font-size: 40px; font-weight: bold; text-align: center;">
+                        Test Page for Basic Auth
+                        </div>
+                      </body>
+                       </html>
+    
+    Activer le site : a2ensite auth-basic 
+    Rédemarrer apache2
