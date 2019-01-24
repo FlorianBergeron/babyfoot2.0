@@ -1,61 +1,89 @@
 // #include <rgb_lcd.h>
 #include <millisDelay.h>
+#include <FastLED.h>
 
+// LED
 int scoreRedLed;
 int scoreBlueLed;
-int gamelleLed;
+int bowlLed;
 
+// BUTTON
 int scoreRedBtn;
 int scoreBlueBtn;
-int gamelleRedBtn;
-int gamelleBlueBtn;
+int bowlRedBtn;
+int bowlBlueBtn;
 int resetBtn;
 
+int resetBtnPushed;
+
+// SCORE
 int scoreRed;
 int scoreBlue;
+int goalValue;
+int lastScore;
 
-int delayTime;
+// DELAY
+int delayTimeBowl;
+int delayTimeHalf;
+int delayTimeReset;
 
-boolean isGamelleRed;
-boolean isGamelleBlue;
+// OTHERS
+boolean isbowlRed;
+boolean isbowlBlue;
 
 boolean isScoreRed;
 boolean isScoreBlue;
 
+boolean resetBtnStatus;
+
 millisDelay gDelayRed;
 millisDelay gDelayBlue;
+millisDelay gDelayTimeHalf;
+millisDelay gDelayTimeReset;
 
 void setup() {
   // put your setup code here, to run once:
+
+  // LED
   scoreRedLed = 3;
   scoreBlueLed = 8;
-  gamelleLed = 6;
+  bowlLed = 6;
 
+  // BUTTON
   scoreRedBtn = 5;
   scoreBlueBtn = 9;
-  gamelleRedBtn = 4;
-  gamelleBlueBtn = 7;
+  bowlRedBtn = 4;
+  bowlBlueBtn = 7;
   resetBtn = 2;
+  resetBtnPushed = 0;
 
+  // SCORE
   scoreRed = 0;
   scoreBlue = 0;
+  goalValue = 1;
+  lastScore = -1;
 
-  isGamelleRed = false;
-  isGamelleBlue = false;
+  // DELAY
+  delayTimeBowl = 2000; //delay time == 2 seconds
+  delayTimeHalf = 1000;
+  delayTimeReset = 3000;
+  
+  // OTHERS
+  isbowlRed = false;
+  isbowlBlue = false;
 
   isScoreRed = false;
   isScoreBlue = false;
 
-  delayTime = 2000; //delay time == 2 seconds
 
   pinMode(scoreRedLed, OUTPUT);
   pinMode(scoreBlueLed, OUTPUT);
-  pinMode(gamelleLed, OUTPUT);
+  pinMode(bowlLed, OUTPUT);
    
   pinMode(scoreRedBtn, INPUT);
   pinMode(scoreBlueBtn, INPUT);
-  pinMode(gamelleRedBtn, INPUT);
-  pinMode(gamelleBlueBtn, INPUT);
+  pinMode(bowlRedBtn, INPUT);
+  pinMode(bowlBlueBtn, INPUT);
   pinMode(resetBtn, INPUT);
 }
 
@@ -64,41 +92,48 @@ void loop() {
   boolean scoreRedBtnStatus = digitalRead(scoreRedBtn);
   boolean scoreBlueBtnStatus = digitalRead(scoreBlueBtn);
   boolean resetBtnStatus = digitalRead(resetBtn);
-  boolean gamelleRedBtnStatus = digitalRead(gamelleRedBtn);
-  boolean gamelleBlueBtnStatus = digitalRead(gamelleBlueBtn);
+  boolean bowlRedBtnStatus = digitalRead(bowlRedBtn);
+  boolean bowlBlueBtnStatus = digitalRead(bowlBlueBtn);
   
 Serial.begin(115200);
 
-  //RED TEAM
+  //RED TEAM --------------------------------------------------------------------------------------------------------------------------------------------------
   // Check piezo Red captor is TRUE
-  if(gamelleRedBtnStatus == HIGH) {
-    isGamelleRed = true;
+  if(bowlRedBtnStatus == HIGH) {
+    isbowlRed = true;
     delay(500);
-    blinking(gamelleLed, 2, 100);
-    if(isGamelleRed == true) {
-      Serial.println("Gamelle rouge");
+    blinking(bowlLed, 2, 100);
+    if(isbowlRed == true) {
+      Serial.println("-----------------");
+      Serial.println("Red bowl");
       delay(10);
     }
-    gDelayRed.start(delayTime);
+    gDelayRed.start(delayTimeBowl);
   }
    
   // Check IR Red captor is TRUE
-  if(scoreRedBtnStatus == HIGH && isGamelleRed == true && gDelayRed.isFinished()==false) {
+  if(scoreRedBtnStatus == LOW && isbowlRed == true && gDelayRed.isFinished()==false) {
     isScoreRed = true;
     if(isScoreRed == true) {
-      Serial.println("Score rouge");
+      Serial.println("Red Score");
       delay(10);
     }
   }
 
   // Increment score
-  if(isScoreRed == true && isGamelleRed == true) {
-    scoreRed++;
-    Serial.print("SCORE RED = ");
-    Serial.println(scoreRed);
-    Serial.print("SCORE BLEU = ");
-    Serial.println(scoreBlue);
+  if(isScoreRed == true && isbowlRed == true) {
+    scoreRed += goalValue;
+    goalValue = 1;
+    lastScore = 1;
     Serial.println("*****************");
+    Serial.print("Goal Value =");
+    Serial.println(goalValue);
+    Serial.print("Last Score =");
+    Serial.println(lastScore);
+    Serial.print("RED SCORE = ");
+    Serial.println(scoreRed);
+    Serial.print("BLUE SCORE = ");
+    Serial.println(scoreBlue);
     delay(500);
     for(int i=0; i<scoreRed ;i++) {
       digitalWrite(scoreRedLed, HIGH);
@@ -119,23 +154,23 @@ Serial.begin(115200);
     // Reset score and captors when there is a goal
     scoreRed = 0;
     scoreBlue = 0;
-    isScoreRed = false;
-    isGamelleRed = false;
-    isScoreBlue = false;
-    isGamelleBlue = false;
     }
+    isScoreRed = false;
+    isbowlRed = false;
+    isScoreBlue = false;
+    isbowlBlue = false;
   }
   
 //Decrement score
-  if(isScoreRed == false && isGamelleRed == true && gDelayRed.isFinished()) {
+  if(isScoreRed == false && isbowlRed == true && gDelayRed.isFinished()) {
     if(scoreBlue > 0 ){
       scoreBlue--;
     }
-    Serial.print("SCORE RED = ");
-    Serial.println(scoreRed);
-    Serial.print("SCORE BLEU = ");
-    Serial.println(scoreBlue);
     Serial.println("*****************");
+    Serial.print("RED SCORE = ");
+    Serial.println(scoreRed);
+    Serial.print("BLUE SCORE = ");
+    Serial.println(scoreBlue);
     delay(500);
     for(int i=0; i<scoreRed; i++) {
       digitalWrite(scoreRedLed, HIGH);
@@ -143,41 +178,48 @@ Serial.begin(115200);
       digitalWrite(scoreRedLed, LOW);
       delay(250);
     }
-    isGamelleRed = false;
+    isbowlRed = false;
   }
 
   //------------------------------------------------------------------------------------------------------------------------------------------------------ 
   // BLUE TEAM
   // Check piezo Blue captor is TRUE
-  if(gamelleBlueBtnStatus == HIGH) {
-    isGamelleBlue = true;
+  if(bowlBlueBtnStatus == HIGH) {
+    isbowlBlue = true;
     delay(500);
-    blinking(gamelleLed, 2, 100);
-    if(isGamelleBlue == true) {
-      Serial.println("Gamelle bleu");
+    blinking(bowlLed, 2, 100);
+    if(isbowlBlue == true) {
+      Serial.println("-----------------");
+      Serial.println("Blue bowl");
       delay(10);
     }
-    gDelayBlue.start(delayTime);
+    gDelayBlue.start(delayTimeBowl);
   }
    
  
   // Check IR Blue captor is TRUE
-  if(scoreBlueBtnStatus == HIGH && isGamelleBlue == true && gDelayBlue.isFinished()==false) {
+  if(scoreBlueBtnStatus == LOW && isbowlBlue == true && gDelayBlue.isFinished()==false) {
     isScoreBlue = true;
     if(isScoreBlue == true) {
-      Serial.println("Score bleu");
+      Serial.println("Blue Score");
       delay(10);
     }
   }
 
   // Increment score
-  if(isScoreBlue == true && isGamelleBlue == true) {
-    scoreBlue++;
-    Serial.print("SCORE RED = ");
-    Serial.println(scoreRed);
-    Serial.print("SCORE BLEU = ");
-    Serial.println(scoreBlue);
+  if(isScoreBlue == true && isbowlBlue == true) {
+    scoreBlue += goalValue;
+    goalValue = 1;
+    lastScore = 0;
     Serial.println("*****************");
+    Serial.print("Goal Value =");
+    Serial.println(goalValue);
+    Serial.print("Last Score =");
+    Serial.println(lastScore);
+    Serial.print("RED SCORE = ");
+    Serial.println(scoreRed);
+    Serial.print("BLUE SCORE = ");
+    Serial.println(scoreBlue);
     delay(500);
     for(int i=0; i<scoreBlue ;i++) {
       digitalWrite(scoreBlueLed, HIGH);
@@ -187,7 +229,7 @@ Serial.begin(115200);
     }
 
     // Score needed to win the game
-    if(scoreBlue >= 3) {
+    if(scoreBlue >= 3){
       Serial.println("!!!!!!!!!!!!!!!!!");
       Serial.println("!!!!!!!!!!!!!!!!!");
       Serial.println("    YOU WON!");
@@ -198,21 +240,21 @@ Serial.begin(115200);
     // Reset score and captors when there is a goal
     scoreRed = 0;
     scoreBlue = 0;
-    isScoreRed = false;
-    isGamelleRed = false;
-    isScoreBlue = false;
-    isGamelleBlue = false;
     }
+    isScoreRed = false;
+    isbowlRed = false;
+    isScoreBlue = false;
+    isbowlBlue = false;
   }
   
 //Decrement score
-  if(isScoreBlue == false && isGamelleBlue == true && gDelayBlue.isFinished()) {
+  if(isScoreBlue == false && isbowlBlue == true && gDelayBlue.isFinished()){
     if(scoreRed > 0 ){
       scoreRed--;
     }
-    Serial.print("SCORE RED = ");
+    Serial.print("RED SCORE = ");
     Serial.println(scoreRed);
-    Serial.print("SCORE BLEU = ");
+    Serial.print("BLUE SCORE = ");
     Serial.println(scoreBlue);
     Serial.println("*****************");
     delay(500);
@@ -222,12 +264,108 @@ Serial.begin(115200);
       digitalWrite(scoreBlueLed, LOW);
       delay(250);
     }
-    isGamelleBlue = false;
+    isbowlBlue = false;
   }
 
   //----------------------------------------------------------------------------------------------------------------------------------------------------------
+  
+  // Reset button is activaded
+  if (resetBtnStatus == HIGH){
+    half();
+    // Serial.println("resetFunction()");
+    // delay(500);
+    // resetFunction();
+    // Serial.println(">>>>>>>>>>>>>>>>>");
+    // Serial.println("<<<<<<<<<<<<<<<<<");
+    // Serial.println("    NEW GAME");
+    // Serial.println("<<<<<<<<<<<<<<<<<");
+    // Serial.println(">>>>>>>>>>>>>>>>>");
+
+    // scoreRed = 0;
+    // scoreBlue = 0;
+
+    // isScoreRed = false;
+    // isbowlRed = false;
+    // isScoreBlue = false;
+    // isbowlBlue = false;
+
+    // lastScore = -1;
+    // goalValue = 1;
+
+    // delay(500);
+    // digitalWrite(scoreRedLed, HIGH);
+    // digitalWrite(scoreBlueLed, HIGH);
+    // delay(2000);
+    // digitalWrite(scoreRedLed, LOW);
+    // digitalWrite(scoreBlueLed, LOW);
+  }
+}
+
+// FUNCTIONS --------------------------------------------------------------------------------------------------------------------
+
+// Make blinking LED
+void blinking(int pin, int occurences, int duration) {
+  for(int i=0; i<occurences; i++) {
+    digitalWrite(pin, HIGH);
+    delay(duration);
+    digitalWrite(pin, LOW);
+    delay(duration);
+  }
+}
+
+// Remove last point and iactive half function
+void half(){
+  if (lastScore == 1){
+    scoreRed--;
+    Serial.println("/////////////////");
+    Serial.println("Red half");
+    Serial.println("*****************");
+    Serial.print("RED SCORE = ");
+    Serial.println(scoreRed);
+    Serial.print("BLUE SCORE = ");
+    Serial.println(scoreBlue);
+    delay(500);
+  }
+  else if (lastScore == 0){
+    scoreBlue--;
+    Serial.println("/////////////////");
+    Serial.println("Blue half");
+    Serial.println("*****************");
+    Serial.print("RED SCORE = ");
+    Serial.println(scoreRed);
+    Serial.print("BLUE SCORE = ");
+    Serial.println(scoreBlue);
+    delay(500);
+  }
+  else
+    return;
+  goalValue = 2;
+  lastScore = -1;
+  return;
+}
+
+void resetFunction() {
+  gDelayTimeHalf.start(delayTimeHalf);
+  gDelayTimeReset.start(delayTimeReset);
+
+  // Trigger half()
+  if (resetBtnStatus == HIGH){
+    Serial.println("resetBtnPushed++");
+    delay(500);
+    resetBtnPushed++;
+    Serial.print("Reset Btn Pushed = ");
+    Serial.println(resetBtnPushed);
+    resetBtnStatus == LOW;
+    if (resetBtnStatus == HIGH && resetBtnPushed == 2 && delayTimeHalf == 1000){
+    Serial.println("half()");
+    delay(500);
+    half();
+    resetBtnPushed = 0;
+    }
+  }
+
   // New Game ==> Reset score
-  if(resetBtnStatus == HIGH) {
+  if (resetBtnStatus == HIGH && delayTimeReset == 3000){
     Serial.println(">>>>>>>>>>>>>>>>>");
     Serial.println("<<<<<<<<<<<<<<<<<");
     Serial.println("    NEW GAME");
@@ -238,9 +376,12 @@ Serial.begin(115200);
     scoreBlue = 0;
 
     isScoreRed = false;
-    isGamelleRed = false;
+    isbowlRed = false;
     isScoreBlue = false;
-    isGamelleBlue = false;
+    isbowlBlue = false;
+
+    lastScore = -1;
+    goalValue = 1;
 
     delay(500);
     digitalWrite(scoreRedLed, HIGH);
@@ -251,20 +392,10 @@ Serial.begin(115200);
   }
 }
 
+
 // TODO
 
-// Gérer notion d'équipe.
-// Gérer les demi? (appuyer sur reset button ==> demi (-1 score et prochain but ==> score = score +2)).
+// Gérer les demi? (appuyer 2 fois sur reset button ==> demi (-1 score et prochain but ==> score = score +2)).
 //                 (appuyer sur reset button pendant 3s ===> New Game function is call).
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------
-// Functions
-
-void blinking(int pin, int occurences, int duration) {
-  for(int i=0; i<occurences; i++) {
-    digitalWrite(pin, HIGH);
-    delay(duration);
-    digitalWrite(pin, LOW);
-    delay(duration);
-  }
-}
