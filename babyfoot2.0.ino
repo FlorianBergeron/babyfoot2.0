@@ -392,6 +392,21 @@ void resetFunction() {
   }
 }
 
+// led pattern
+void caterpillar(int occurences) {
+  for(int i=0; i<occurences; i++) {
+    for(int i=0; i<NUM_LEDS; i++) {
+      leds[i] = CRGB(255, 0, 0);
+      FastLED.show();
+      delay(TIME);
+    }
+    for(int i=0; i<NUM_LEDS; i++) {
+      leds[i] = CRGB(0, 0, 0);
+      FastLED.show();
+      delay(TIME);
+    }
+  }
+}
 
 // TODO
 
