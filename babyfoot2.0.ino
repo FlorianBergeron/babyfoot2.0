@@ -393,10 +393,10 @@ void resetFunction() {
 }
 
 // led pattern
-void caterpillar(int occurences) {
+void caterpillar(int occurences, int red, int green, int blue, int len) {
   for(int i=0; i<occurences; i++) {
     for(int i=0; i<NUM_LEDS; i++) {
-      leds[i] = CRGB(255, 0, 0);
+      leds[i] = CRGB(red, green, blue);
       FastLED.show();
       delay(TIME);
     }
@@ -405,6 +405,26 @@ void caterpillar(int occurences) {
       FastLED.show();
       delay(TIME);
     }
+  }
+}
+
+void snake(int occurences, int red, int green, int blue, int len) {
+  for(int i=0; i<occurences; i++) {
+    for(int i=0; i<NUM_LEDS; i++) {
+      leds[i] = CRGB(red, green, blue);
+      if(i>=len) {
+        leds[i-len] = CRGB(0, 0, 0);
+      } else {
+        leds[i+(NUM_LEDS-len)] = CRGB(0, 0, 0);
+      }
+      FastLED.show();
+      delay(TIME);
+    }
+  }
+  for(int i=0; i<len; i++) {
+    leds[NUM_LEDS-len+i] = CRGB(0, 0, 0);
+    FastLED.show();
+    delay(TIME);
   }
 }
 
