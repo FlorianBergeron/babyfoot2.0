@@ -2,8 +2,8 @@
 #include <millisDelay.h>
 #include <FastLED.h>
 
-#define LED_PIN     10
-#define NUM_LEDS    30
+#define LED_PIN     12
+#define NUM_LEDS    120
 #define TIME        1
 
 #define A0_PIN_BLUE_CAPTOR 0
@@ -62,12 +62,15 @@ millisDelay gDelayBlue;
 millisDelay gDelayTimeHalf;
 millisDelay gDelayTimeReset;
 
+void blinking(int pin, int occurences, int duration);
+void caterpillar(int occurences, int red, int green, int blue);
+
 void setup() {
   // put your setup code here, to run once:
   FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
   
   // LED
-  scoreRedLed = 5;
+  scoreRedLed = 12;
   scoreBlueLed = 12;
   bowlLed = 10;
   // stripLed = 10;
@@ -179,12 +182,13 @@ void loop() {
     Serial.print("BLUE SCORE = ");
     Serial.println(scoreBlue);
     delay(500);
-    for (int i=0; i<scoreBlue ;i++) {
-      digitalWrite(scoreBlueLed, HIGH);
-      delay(500);
-      digitalWrite(scoreBlueLed, LOW);
-      delay(250);
-    }
+    caterpillar(2, 255, 0, 0);
+    //for (int i=0; i<scoreBlue ;i++) {
+    //  digitalWrite(scoreBlueLed, HIGH);
+    //  delay(500);
+    //  digitalWrite(scoreBlueLed, LOW);
+    //  delay(250);
+    
 
     // Score needed to win the game
     if (scoreBlue >= 3){
@@ -194,7 +198,8 @@ void loop() {
       Serial.println("!!!!!!!!!!!!!!!!!");
       Serial.println("!!!!!!!!!!!!!!!!!");
       delay(1000);
-      blinking(scoreBlueLed, 10, 100);
+      caterpillar(10, 0, 255, 0);
+    // blinking(scoreBlueLed, 10, 100);
     // Reset score and captors when there is a goal
     scoreRed = 0;
     scoreBlue = 0;
@@ -264,12 +269,13 @@ void loop() {
     Serial.print("BLUE SCORE = ");
     Serial.println(scoreBlue);
     delay(500);
-    for (int i=0; i<scoreRed ;i++) {
-      digitalWrite(scoreRedLed, HIGH);
-      delay(500);
-      digitalWrite(scoreRedLed, LOW);
-      delay(250);
-    }
+    caterpillar(2, 0, 0, 255); 
+    //for (int i=0; i<scoreRed ;i++) {
+    //  digitalWrite(scoreRedLed, HIGH);
+    //  delay(500);
+    //  digitalWrite(scoreRedLed, LOW);
+    //  delay(250);
+    
  
     // Score needed to win the game
     if (scoreRed >= 3) {
@@ -279,6 +285,7 @@ void loop() {
       Serial.println("!!!!!!!!!!!!!!!!!");
       Serial.println("!!!!!!!!!!!!!!!!!");
       delay(1000);
+      caterpillar(2, 0, 255, 0);
       blinking(scoreRedLed, 10, 100);
     // Reset score and captors when there is a goal
     scoreRed = 0;
@@ -291,7 +298,7 @@ void loop() {
   }
   
 //Decrement score
-  if (isScoreRed == false && isbowlRed == true && gDelayRed.isFinished()) {
+  if(isScoreRed == false && isbowlRed == true && gDelayRed.isFinished()) {
     if (scoreBlue > 0 ){
       scoreBlue--;
     }
@@ -313,25 +320,25 @@ void loop() {
   //----------------------------------------------------------------------------------------------------------------------------------------------------------
   
   // Reset button is activaded
-  if (resetBtnStatus == HIGH){
+ /* if (resetBtnStatus == LOW){
     Serial.println("resetFunction()");
     delay(500);
     resetFunction();
   }
 
   // Half button is activaded
-  if (halfBtnStatus == HIGH){
+  if (halfBtnStatus == LOW){
     Serial.println("halfFunction()");
     delay(500);
     halfFunction();
   }
 
   // Pissette button is activaded
-  if (pissetteBtnStatus == HIGH){
+  if (pissetteBtnStatus == LOW){
     Serial.println("pissetteFunction()");
     delay(500);
     pissetteFunction();
-  }
+  }*/
 
 }
 // FUNCTIONS --------------------------------------------------------------------------------------------------------------------
@@ -435,23 +442,18 @@ void pissetteFunction(){
   return;
 }
 // LED pattern
-void caterpillar(int occurences, int red, int green, int blue, int length) {
+void caterpillar(int occurences, int red, int green, int blue) {
   for(int i=0; i<occurences; i++) {
     for(int i=0; i<NUM_LEDS; i++) {
       leds[i] = CRGB(red, green, blue);
-      if(i>=length) {
-        leds[i-length] = CRGB(0, 0, 0);
-      } else {
-        leds[i+(NUM_LEDS-length)] = CRGB(0, 0, 0);
-      }
       FastLED.show();
       delay(TIME);
     }
-  }
-  for(int i=0; i<length; i++) {
-    leds[NUM_LEDS-length+i] = CRGB(0, 0, 0);
-    FastLED.show();
-    delay(TIME);
+    for(int i=0; i<NUM_LEDS; i++) {
+      leds[i] = CRGB(0, 0, 0);
+      FastLED.show();
+      delay(TIME);
+    }
   }
 }
 
