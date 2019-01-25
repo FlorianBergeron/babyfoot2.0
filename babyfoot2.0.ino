@@ -21,17 +21,19 @@ int stripLed;
 CRGB leds[NUM_LEDS];
 
 // BUTTON
-int scoreRedBtn;
-int scoreBlueBtn;
+int scoreRedIrCaptor;
+int scoreBlueIrCaptor;
 // int bowlRedBtn;
 // int bowlBlueBtn;
 int resetBtn;
+int halfBtn;
+int pissetteBtn;
 
 // PIEZO
 int piezoBlueVal;
 int piezoRedVal;
 
-int resetBtnPushed;
+//int resetBtnPushed;
 
 // SCORE
 int scoreRed;
@@ -52,6 +54,8 @@ boolean isScoreRed;
 boolean isScoreBlue;
 
 boolean resetBtnStatus;
+boolean halfBtnStatus;
+boolean pissetteBtnStatus;
 
 millisDelay gDelayRed;
 millisDelay gDelayBlue;
@@ -63,22 +67,28 @@ void setup() {
   FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
   
   // LED
-  scoreRedLed = 3;
-  scoreBlueLed = 8;
-  bowlLed = 6;
+  scoreRedLed = 5;
+  scoreBlueLed = 12;
+  bowlLed = 10;
   // stripLed = 10;
 
   // PIEZO
   piezoBlueVal = 0;
-  piezoRedVal = 0;
+  piezoRedVal = 1;
 
+  // IR CAPTOR
+  scoreRedIrCaptor = 8;
+  scoreBlueIrCaptor = 13;
+
+  
   // BUTTON
-  scoreRedBtn = 5;
-  scoreBlueBtn = 9;
   // bowlRedBtn = 4;
   // bowlBlueBtn = 7;
   resetBtn = 2;
-  resetBtnPushed = 0;
+  halfBtn = 3;
+  pissetteBtn = 4;
+  
+  //resetBtnPushed = 0;
 
   // SCORE
   scoreRed = 0;
@@ -102,19 +112,24 @@ void setup() {
   pinMode(scoreBlueLed, OUTPUT);
   pinMode(bowlLed, OUTPUT);
 
-  pinMode(scoreRedBtn, INPUT);
-  pinMode(scoreBlueBtn, INPUT);
+  pinMode(scoreRedIrCaptor, INPUT);
+  pinMode(scoreBlueIrCaptor, INPUT);
   // pinMode(bowlRedBtn, INPUT);
   // pinMode(bowlBlueBtn, INPUT);
   pinMode(resetBtn, INPUT);
+  pinMode(halfBtn, INPUT);
+  pinMode(pissetteBtn, INPUT);
   Serial.begin(115200);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  boolean scoreRedBtnStatus = digitalRead(scoreRedBtn);
-  boolean scoreBlueBtnStatus = digitalRead(scoreBlueBtn);
+  boolean scoreRedIrCaptorStatus = digitalRead(scoreRedIrCaptor);
+  boolean scoreBlueIrCaptorStatus = digitalRead(scoreBlueIrCaptor);
   boolean resetBtnStatus = digitalRead(resetBtn);
+  boolean halfBtnStatus = digitalRead(halfBtn);
+  boolean pissetteBtnStatus = digitalRead(pissetteBtn);
+ 
   piezoBlueVal = analogRead(A0_PIN_BLUE_CAPTOR) ;
   piezoRedVal = analogRead(A0_PIN_RED_CAPTOR) ;
 
@@ -141,7 +156,7 @@ void loop() {
   }
    
   // Check IR Blue captor is TRUE
-  if (scoreBlueBtnStatus == LOW && isbowlBlue == true && gDelayBlue.isFinished()==false) {
+  if (scoreBlueIrCaptorStatus == LOW && isbowlBlue == true && gDelayBlue.isFinished()==false) {
     isScoreBlue = true;
     if (isScoreBlue == true) {
       Serial.println("Blue Score");
@@ -216,7 +231,7 @@ void loop() {
   if (piezoRedVal >= 1000) { // if(bowlBlueBtnStatus == HIGH) { ==> To trigger half with button
     isbowlRed = true;
     delay(500);
-    caterpillar(5);
+    blinking(10, 2, 100);
     if (isbowlRed == true) {
       Serial.println("-----------------");
       Serial.println("Red bowl");
@@ -226,7 +241,7 @@ void loop() {
   }
    
   // Check IR Red captor is TRUE
-  if (scoreRedBtnStatus == LOW && isbowlRed == true && gDelayRed.isFinished()==false) {
+  if (scoreRedIrCaptorStatus == LOW && isbowlRed == true && gDelayRed.isFinished()==false) {
     isScoreRed = true;
     if (isScoreRed == true) {
       Serial.println("Red Score");
@@ -299,36 +314,26 @@ void loop() {
   
   // Reset button is activaded
   if (resetBtnStatus == HIGH){
-    half();
-    // Serial.println("resetFunction()");
-    // delay(500);
-    // resetFunction();
-    // Serial.println(">>>>>>>>>>>>>>>>>");
-    // Serial.println("<<<<<<<<<<<<<<<<<");
-    // Serial.println("    NEW GAME");
-    // Serial.println("<<<<<<<<<<<<<<<<<");
-    // Serial.println(">>>>>>>>>>>>>>>>>");
-
-    // scoreRed = 0;
-    // scoreBlue = 0;
-
-    // isScoreRed = false;
-    // isbowlRed = false;
-    // isScoreBlue = false;
-    // isbowlBlue = false;
-
-    // lastScore = -1;
-    // goalValue = 1;
-
-    // delay(500);
-    // digitalWrite(scoreRedLed, HIGH);
-    // digitalWrite(scoreBlueLed, HIGH);
-    // delay(2000);
-    // digitalWrite(scoreRedLed, LOW);
-    // digitalWrite(scoreBlueLed, LOW);
+    Serial.println("resetFunction()");
+    delay(500);
+    resetFunction();
   }
-}
 
+  // Half button is activaded
+  if (halfBtnStatus == HIGH){
+    Serial.println("halfFunction()");
+    delay(500);
+    halfFunction();
+  }
+
+  // Pissette button is activaded
+  if (pissetteBtnStatus == HIGH){
+    Serial.println("pissetteFunction()");
+    delay(500);
+    pissetteFunction();
+  }
+
+}
 // FUNCTIONS --------------------------------------------------------------------------------------------------------------------
 
 // Make blinking LED
@@ -342,7 +347,7 @@ void blinking(int pin, int occurences, int duration) {
 }
 
 // Remove last point and iactive half function
-void half(){
+void halfFunction(){
   if (lastScore == 1){
     scoreRed--;
     Serial.println("/////////////////");
@@ -373,27 +378,7 @@ void half(){
 }
 
 void resetFunction() {
-  gDelayTimeHalf.start(delayTimeHalf);
-  gDelayTimeReset.start(delayTimeReset);
-
-  // Trigger half()
-  if (resetBtnStatus == HIGH){
-    Serial.println("resetBtnPushed++");
-    delay(500);
-    resetBtnPushed++;
-    Serial.print("Reset Btn Pushed = ");
-    Serial.println(resetBtnPushed);
-    resetBtnStatus == LOW;
-    if (resetBtnStatus == HIGH && resetBtnPushed == 2 && delayTimeHalf == 1000){
-    Serial.println("half()");
-    delay(500);
-    half();
-    resetBtnPushed = 0;
-    }
-  }
-
   // New Game ==> Reset score
-  if (resetBtnStatus == HIGH && delayTimeReset == 3000){
     Serial.println(">>>>>>>>>>>>>>>>>");
     Serial.println("<<<<<<<<<<<<<<<<<");
     Serial.println("    NEW GAME");
@@ -417,11 +402,40 @@ void resetFunction() {
     delay(2000);
     digitalWrite(scoreRedLed, LOW);
     digitalWrite(scoreBlueLed, LOW);
-  }
 }
 
+
+// Remove last point
+void pissetteFunction(){
+  if (lastScore == 1){
+    scoreRed--;
+    Serial.println("/////////////////");
+    Serial.println("Red pissette");
+    Serial.println("*****************");
+    Serial.print("RED SCORE = ");
+    Serial.println(scoreRed);
+    Serial.print("BLUE SCORE = ");
+    Serial.println(scoreBlue);
+    delay(500);
+  }
+  else if (lastScore == 0){
+    scoreBlue--;
+    Serial.println("/////////////////");
+    Serial.println("Blue pissette");
+    Serial.println("*****************");
+    Serial.print("RED SCORE = ");
+    Serial.println(scoreRed);
+    Serial.print("BLUE SCORE = ");
+    Serial.println(scoreBlue);
+    delay(500);
+  }
+  else
+    return;
+  lastScore = -1;
+  return;
+}
 // LED pattern
-void snake(int occurences, int red, int green, int blue, int length) {
+void caterpillar(int occurences, int red, int green, int blue, int length) {
   for(int i=0; i<occurences; i++) {
     for(int i=0; i<NUM_LEDS; i++) {
       leds[i] = CRGB(red, green, blue);
