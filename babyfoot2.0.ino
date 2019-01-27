@@ -182,7 +182,7 @@ void loop() {
     Serial.print("BLUE SCORE = ");
     Serial.println(scoreBlue);
     delay(500);
-    caterpillar(2, 255, 0, 0);
+    caterpillar(scoreBlue, 255, 0, 0);
     //for (int i=0; i<scoreBlue ;i++) {
     //  digitalWrite(scoreBlueLed, HIGH);
     //  delay(500);
@@ -191,7 +191,7 @@ void loop() {
     
 
     // Score needed to win the game
-    if (scoreBlue >= 3){
+    if (scoreBlue >= 10){
       Serial.println("!!!!!!!!!!!!!!!!!");
       Serial.println("!!!!!!!!!!!!!!!!!");
       Serial.println("    YOU WON!");
@@ -221,6 +221,7 @@ void loop() {
     Serial.println(scoreBlue);
     Serial.println("*****************");
     delay(500);
+    caterpillar(2, 255, 255, 0);
     for (int i=0; i<scoreBlue; i++) {
       digitalWrite(scoreBlueLed, HIGH);
       delay(500);
@@ -269,7 +270,7 @@ void loop() {
     Serial.print("BLUE SCORE = ");
     Serial.println(scoreBlue);
     delay(500);
-    caterpillar(2, 0, 0, 255); 
+    caterpillar(scoreRed, 0, 0, 255); 
     //for (int i=0; i<scoreRed ;i++) {
     //  digitalWrite(scoreRedLed, HIGH);
     //  delay(500);
@@ -278,7 +279,7 @@ void loop() {
     
  
     // Score needed to win the game
-    if (scoreRed >= 3) {
+    if (scoreRed >= 10) {
       Serial.println("!!!!!!!!!!!!!!!!!");
       Serial.println("!!!!!!!!!!!!!!!!!");
       Serial.println("    YOU WON!");
@@ -308,6 +309,7 @@ void loop() {
     Serial.print("BLUE SCORE = ");
     Serial.println(scoreBlue);
     delay(500);
+    caterpillar(2, 255, 255, 0);
     for (int i=0; i<scoreRed; i++) {
       digitalWrite(scoreRedLed, HIGH);
       delay(500);
@@ -320,19 +322,21 @@ void loop() {
   //----------------------------------------------------------------------------------------------------------------------------------------------------------
   
   // Reset button is activaded
- /* if (resetBtnStatus == LOW){
-    Serial.println("resetFunction()");
-    delay(500);
-    resetFunction();
-  }
+  // if (resetBtnStatus == HIGH){
+  //   Serial.println("resetFunction()");
+  //   resetFunction();
+  //   delay(500);
+  //   caterpillar(2, 0, 255, 255);
+  // }
 
   // Half button is activaded
-  if (halfBtnStatus == LOW){
-    Serial.println("halfFunction()");
-    delay(500);
-    halfFunction();
-  }
+  // if (halfBtnStatus == HIGH){
+  //   Serial.println("halfFunction()");
+  //   delay(500);
+  //   halfFunction();
+  // }
 
+/*
   // Pissette button is activaded
   if (pissetteBtnStatus == LOW){
     Serial.println("pissetteFunction()");
